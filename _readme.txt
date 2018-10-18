@@ -1,0 +1,3 @@
+make
+export DISPLAY=:0
+./tips

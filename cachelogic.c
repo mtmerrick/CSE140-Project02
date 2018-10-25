@@ -81,13 +81,74 @@ void init_lru(int assoc_index, int block_index)
 void accessMemory(address addr, word* data, WriteEnable we)
 {
   /* Declare variables here */
+	unsigned int index_bits;
+	unsigned int offset_bits;
+	unsigned int tag_bits;
 
   /* handle the case of no cache at all - leave this in */
-  if(assoc == 0) {
-    accessDRAM(addr, (byte*)data, WORD_SIZE, we);
+  	if(assoc == 0) {
+   	 accessDRAM(addr, (byte*)data, WORD_SIZE, we);
     return;
   }
 
+	switch (block_size){
+		case 4:
+		{
+			offset_bits = 2;
+			break;
+		}
+		case 8:
+		{
+			offset_bits = 3;
+			break;
+		}
+		case 16:
+		{
+			offset_bits = 4;
+			break;
+		}
+		case 32:
+		{
+			offset_bits = 5;
+			break;
+		}
+		default:	//placeholder
+		{
+			return;
+		}
+	}
+	switch (set_count){
+		case 1:
+		{
+			index_bits = 0;
+			break;
+		}
+		case 2:
+		{
+			index_bits = 1;
+			break;
+		}
+		case 4:
+		{
+			index_bits = 2;
+			break;
+		}
+		case 8:
+		{
+			index_bits = 3;
+			break;
+		}
+		case 16:
+		{
+			index_bits = 4;
+			break;
+		}
+		default:
+		{
+			return;
+		}
+	}
+	
   /*
   You need to read/write between memory (via the accessDRAM() function) and
   the cache (via the cache[] global structure defined in tips.h)

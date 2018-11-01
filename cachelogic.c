@@ -1,8 +1,5 @@
 #include "tips.h"
 #include "math.h"
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
 
 /* The following two functions are defined in util.c */
 
@@ -93,7 +90,9 @@ void accessMemory(address addr, word* data, WriteEnable we)
 	unsigned int index;
 	unsigned int mask = 0;
 	cacheBlock* temp;
+	int b = 0;
 	int aNum = 0;
+	unsigned int tempAddr;
 
 	/* handle the case of no cache at all - leave this in */
 		if(assoc == 0) {
@@ -153,41 +152,53 @@ void accessMemory(address addr, word* data, WriteEnable we)
 			index_bits = 4;
 			break;
 		}
-		default:	//placeholder
+		default:
 		{
 			return;
 		}
 	}
-	
+	// get tag
 	tag_bits = 32 - (index_bits + offset_bits);
 	for(int i = 0;i < tag_bits; i++){
 		mask += pow(2,32-(int)i);
 	}
 	tag = addr & mask;
+	//get index
 	mask = 0;
 	for(int i = 0; i < index_bits; i++){
 		mask += pow(2, 32-(int)tag_bits-(int)i);
 	}
 	index = addr & mask;
+	//get offset
 	mask = 0;
 	for(int i = 0; i < offset_bits; i++){
 		mask += pow(2, (int)i);
 	}
 	offset = addr & mask;
-	for(int i = 0; i < assoc; i++){
-		if(cache[index].block[i].tag == tag && cache[index].block[i].valid == VALID){
+	//determine if this is a hit or a miss
+	for(; b < assoc; b++){
+		//if it's a hit, grab the data for a read, or write data for a write
+		if(cache[index].block[b].tag == tag && cache[index].block[b].valid == VALID){
 			if(we == READ){
-				data = (word*)cache[index].block[i].data;
+				data = (word*)cache[index].block[b].data;
 			}
 			else{
-				cache[index].block[i].data = (byte*)data;
+				cache[index].block[b].data = (byte*)data;
+				if(memory_sync_policy == WRITE_THROUGH){
+					memcpy(addr, cache[index].block[b], (size_t)block_size);
+				}
+				else{
+					cache[index].block[b].dirty = DIRTY;
+				}
 			}
 			highlight_offset(index, i, offset, HIT);
 			return;
 		}
 	}
+	//on a miss, choose block to replace
 	if(assoc > 1){
 		if(ReplacementPolicy == LRU){
+			//determine LRU block
 			for(int i = 0; i < assoc; i++){
 				if(cache[index].block[i].lru.value++ > cache.[index].block[aNum].lru.value){
 					aNum = i;
@@ -198,20 +209,34 @@ void accessMemory(address addr, word* data, WriteEnable we)
 			return;	//fuck off, we're not supposed to need to do this
 		}
 		else{
-			srand(time(0));
-			aNum = rand() % assoc;
+			//otherwise, use a random number
+			aNum = randomint(assoc);
 		}
 	}
 	temp = cache[index].block[aNum];
+	//reset LRU value for the chosen block
 	temp.lru.value = 0;
+	// if the block has been changed, write back to memory before replacing it
+	if(temp.dirty == DIRTY){
+		memcpy(addr, temp, (size_t)block_size);
+	}
+	//highlight chosen block
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
-	accessDRAM(addr, data, WORD_SIZE, we);
+	//copy block from memory
+	memcpy(temp, addr, (size_t)block_size);
 	if(we == READ){
-		memcpy(temp, addr, (size_t)block_size);
+		data = (word*)temp.data;
 	}
 	else{
-		memcpy(addr, temp, (size_t)block_size);
+		//check memory sync policy and act accordingly
+		if(memory_sync_policy == WRITE_THROUGH){
+			memcpy(addr, temp, (size_t)block_size);
+		}
+		else{
+			temp.dirty = DIRTY;
+		}
+		(word*)temp.data = data;
 	}
 	
 	/*

@@ -95,8 +95,8 @@ void accessMemory(address addr, word* data, WriteEnable we)
 	unsigned int tempAddr;
 
 	/* handle the case of no cache at all - leave this in */
-		if(assoc == 0) {
-			accessDRAM(addr, (byte*)data, WORD_SIZE, we);
+	if(assoc == 0) {
+		accessDRAM(addr, (byte*)data, WORD_SIZE, we);
 		return;
 	}
 
@@ -121,7 +121,7 @@ void accessMemory(address addr, word* data, WriteEnable we)
 			offset_bits = 5;
 			break;
 		}
-		default:	//placeholder
+		default:
 		{
 			return;
 		}

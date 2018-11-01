@@ -1,5 +1,8 @@
 #include "tips.h"
 #include "math.h"
+#include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 
 /* The following two functions are defined in util.c */
 
@@ -90,6 +93,7 @@ void accessMemory(address addr, word* data, WriteEnable we)
 	unsigned int index;
 	unsigned int mask = 0;
 	cacheBlock* temp;
+	int aNum = 0;
 
 	/* handle the case of no cache at all - leave this in */
 		if(assoc == 0) {
@@ -180,20 +184,26 @@ void accessMemory(address addr, word* data, WriteEnable we)
 			}
 			highlight_offset(index, i, offset, HIT);
 			return;
-			//byte* temp = cache[index].block[i].data;
-			//accessDRAM(addr, temp, WORD_SIZE, we);
 		}
 	}
-	int aNum;
-	if(ReplacementPolicy == LRU){
-		//figure out LRU bullshit here, point temp at the block you find
+	if(assoc > 1){
+		if(ReplacementPolicy == LRU){
+			for(int i = 0; i < assoc; i++){
+				if(cache[index].block[i].lru.value++ > cache.[index].block[aNum].lru.value){
+					aNum = i;
+				}
+			}
+		}
+		else if(ReplacementPolicy == LFU){
+			return;	//fuck off, we're not supposed to need to do this
+		}
+		else{
+			srand(time(0));
+			aNum = rand() % assoc;
+		}
 	}
-	else if(ReplacementPolicy == LFU){
-		return;	//fuck you, we're not supposed to need to do this
-	}
-	else{
-		//pick a block at random, point temp at it
-	}
+	temp = cache[index].block[aNum];
+	temp.lru.value = 0;
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	accessDRAM(addr, data, WORD_SIZE, we);
@@ -239,5 +249,5 @@ void accessMemory(address addr, word* data, WriteEnable we)
 	 At some point, ONCE YOU HAVE MORE OF YOUR CACHELOGIC IN PLACE,
 	 THIS LINE SHOULD BE REMOVED.
 	*/
-	accessDRAM(addr, (byte*)data, WORD_SIZE, we);
+	//accessDRAM(addr, (byte*)data, WORD_SIZE, we);
 }

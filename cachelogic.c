@@ -180,10 +180,10 @@ void accessMemory(address addr, word* data, WriteEnable we)
 		//if it's a hit, grab the data for a read, or write data for a write
 		if(cache[index].block[b].tag == tag && cache[index].block[b].valid == VALID){
 			if(we == READ){
-				data = (word*)cache[index].block[b].data;
+				data = (word*)cache[index].block[b].data[offset];
 			}
 			else{
-				cache[index].block[b].data = (byte*)data;
+				cache[index].block[b].data[offset] = (byte*)data;
 				if(memory_sync_policy == WRITE_THROUGH){
 					memcpy(addr, cache[index].block[b], (size_t)block_size);
 				}
@@ -191,7 +191,7 @@ void accessMemory(address addr, word* data, WriteEnable we)
 					cache[index].block[b].dirty = DIRTY;
 				}
 			}
-			highlight_offset(index, i, offset, HIT);
+			highlight_offset(index, b, offset, HIT);
 			return;
 		}
 	}
@@ -226,7 +226,7 @@ void accessMemory(address addr, word* data, WriteEnable we)
 	//copy block from memory
 	memcpy(temp, addr, (size_t)block_size);
 	if(we == READ){
-		data = (word*)temp.data;
+		data = (word*)temp.data[offset];
 	}
 	else{
 		//check memory sync policy and act accordingly
@@ -236,7 +236,7 @@ void accessMemory(address addr, word* data, WriteEnable we)
 		else{
 			temp.dirty = DIRTY;
 		}
-		(word*)temp.data = data;
+		(word*)temp.data[offset] = data;
 	}
 	
 	/*

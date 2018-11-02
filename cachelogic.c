@@ -185,7 +185,7 @@ void accessMemory(address addr, word* data, WriteEnable we)
 			else{
 				cache[index].block[b].data[offset] = (byte*)data;
 				if(memory_sync_policy == WRITE_THROUGH){
-					memcpy(addr, cache[index].block[b], (size_t)block_size);
+					memcpy(addr, &cache[index].block[b], (size_t)block_size);
 				}
 				else{
 					cache[index].block[b].dirty = DIRTY;
@@ -197,15 +197,15 @@ void accessMemory(address addr, word* data, WriteEnable we)
 	}
 	//on a miss, choose block to replace
 	if(assoc > 1){
-		if(ReplacementPolicy == LRU){
+		if(policy == LRU){
 			//determine LRU block
 			for(int i = 0; i < assoc; i++){
-				if(cache[index].block[i].lru.value++ > cache.[index].block[aNum].lru.value){
+				if(cache[index].block[i].lru.value++ > cache[index].block[aNum].lru.value){
 					aNum = i;
 				}
 			}
 		}
-		else if(ReplacementPolicy == LFU){
+		else if(policy == LFU){
 			return;	//fuck off, we're not supposed to need to do this
 		}
 		else{
@@ -213,11 +213,11 @@ void accessMemory(address addr, word* data, WriteEnable we)
 			aNum = randomint(assoc);
 		}
 	}
-	temp = cache[index].block[aNum];
+	temp = &cache[index].block[aNum];
 	//reset LRU value for the chosen block
-	temp.lru.value = 0;
+	temp->lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it
-	if(temp.dirty == DIRTY){
+	if(temp->dirty == DIRTY){
 		memcpy(addr, temp, (size_t)block_size);
 	}
 	//highlight chosen block
@@ -226,7 +226,7 @@ void accessMemory(address addr, word* data, WriteEnable we)
 	//copy block from memory
 	memcpy(temp, addr, (size_t)block_size);
 	if(we == READ){
-		data = (word*)temp.data[offset];
+		data = (word*)temp->data[offset];
 	}
 	else{
 		//check memory sync policy and act accordingly
@@ -234,9 +234,9 @@ void accessMemory(address addr, word* data, WriteEnable we)
 			memcpy(addr, temp, (size_t)block_size);
 		}
 		else{
-			temp.dirty = DIRTY;
+			temp->dirty = DIRTY;
 		}
-		(word*)temp.data[offset] = data;
+		temp->data[offset] = data;
 	}
 	
 	/*

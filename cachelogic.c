@@ -168,7 +168,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	//get offset
 	mask = 0;
 	for(int i = 0; i < offset_bits; i++){
-		mask += 1<<(i)//pow(2, (int)i);
+		mask += 1<<(i);	//pow(2, (int)i);
 	}
 	offset = addr & mask;
 	//determine if this is a hit or a miss

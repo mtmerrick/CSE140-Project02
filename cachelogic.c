@@ -17,8 +17,7 @@ int randomint( int x );
 
 	returns a string representation of the lfu information
 	*/
-char* lfu_to_string(int assoc_index, int block_index)
-{
+char* lfu_to_string(int assoc_index, int block_index) {
 	/* Buffer to print lfu information -- increase size as needed. */
 	static char buffer[9];
 	sprintf(buffer, "%u", cache[assoc_index].block[block_index].accessCount);
@@ -50,8 +49,7 @@ char* lru_to_string(int assoc_index, int block_index)
 		block_number - the index of the block to be modified
 
 	*/
-void init_lfu(int assoc_index, int block_index)
-{
+void init_lfu(int assoc_index, int block_index) {
   cache[assoc_index].block[block_index].accessCount = 0;
 }
 
@@ -62,8 +60,7 @@ void init_lfu(int assoc_index, int block_index)
 		block_number - the index of the block to be modified
 
 	*/
-void init_lru(int assoc_index, int block_index)
-{
+void init_lru(int assoc_index, int block_index) {
   cache[assoc_index].block[block_index].lru.value = 0;
 }
 
@@ -79,8 +76,7 @@ void init_lru(int assoc_index, int block_index)
 				if we == WRITE, then data used to
 				update Cache/DRAM
 	*/
-void accessMemory(address addr, word* data, WriteEnable we)
-{
+void accessMemory(address addr, word* data, WriteEnable we) {
 	/* Declare variables here */
 	unsigned int index_bits;
 	unsigned int offset_bits;
@@ -160,19 +156,19 @@ void accessMemory(address addr, word* data, WriteEnable we)
 	// get tag
 	tag_bits = 32 - (index_bits + offset_bits);
 	for(int i = 0;i < tag_bits; i++){
-		mask += pow(2,32-(int)i);
+		mask += 1<<(32-i);//pow(2,32-(int)i);
 	}
 	tag = addr & mask;
 	//get index
 	mask = 0;
 	for(int i = 0; i < index_bits; i++){
-		mask += pow(2, 32-(int)tag_bits-(int)i);
+		mask += 1<<(32-tag_bits-i);//pow(2, 32 - (int)tag_bits - (int)i);
 	}
 	index = addr & mask;
 	//get offset
 	mask = 0;
 	for(int i = 0; i < offset_bits; i++){
-		mask += pow(2, (int)i);
+		mask += 1<<(i)//pow(2, (int)i);
 	}
 	offset = addr & mask;
 	//determine if this is a hit or a miss

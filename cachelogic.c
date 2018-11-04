@@ -209,7 +209,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			aNum = randomint(assoc);
 		}
 	}
-	temp = (word*)&(temp[index].block[aNum]);
+	temp = cache[index].block[aNum];
 	//reset LRU value for the chosen block
 	temp->lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it

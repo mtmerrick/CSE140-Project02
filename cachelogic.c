@@ -88,7 +88,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	cacheBlock* temp;
 	int b = 0;
 	int aNum = 0;
-	unsigned int tempAddr;
+	//unsigned int tempAddr;
 
 	/* handle the case of no cache at all - leave this in */
 	if(assoc == 0) {
@@ -156,19 +156,19 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	// get tag
 	tag_bits = 32 - (index_bits + offset_bits);
 	for(int i = 0;i < tag_bits; i++){
-		mask += 1<<(32-i);//pow(2,32-(int)i);
+		mask += 1 << (32 - i); //pow(2,32-(int)i);
 	}
 	tag = addr & mask;
 	//get index
 	mask = 0;
 	for(int i = 0; i < index_bits; i++){
-		mask += 1<<(32-tag_bits-i);//pow(2, 32 - (int)tag_bits - (int)i);
+		mask += 1 << (32 - tag_bits - i); //pow(2, 32 - (int)tag_bits - (int)i);
 	}
 	index = addr & mask;
 	//get offset
 	mask = 0;
 	for(int i = 0; i < offset_bits; i++){
-		mask += 1<<(i);	//pow(2, (int)i);
+		mask += 1 << (i); //pow(2, (int)i);
 	}
 	offset = addr & mask;
 	//determine if this is a hit or a miss
@@ -176,10 +176,10 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 		//if it's a hit, grab the data for a read, or write data for a write
 		if(cache[index].block[b].tag == tag && cache[index].block[b].valid == VALID){
 			if(we == READ){
-				data = (word*)cache[index].block[b].data[offset];
+				data = &cache[index].block[b].data[offset];
 			}
 			else{
-				cache[index].block[b].data[offset] = (byte*)data;
+				cache[index].block[b].data[offset] = *data;
 				if(memory_sync_policy == WRITE_THROUGH){
 					memcpy(addr, &cache[index].block[b], (size_t)block_size);
 				}
@@ -222,7 +222,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	//copy block from memory
 	memcpy(temp, addr, (size_t)block_size);
 	if(we == READ){
-		data = (word*)temp->data[offset];
+		data = &temp->data[offset];
 	}
 	else{
 		//check memory sync policy and act accordingly
@@ -232,7 +232,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 		else{
 			temp->dirty = DIRTY;
 		}
-		temp->data[offset] = data;
+		temp->data[offset] = *data;
 	}
 	
 	/*

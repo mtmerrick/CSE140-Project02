@@ -176,7 +176,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 		//if it's a hit, grab the data for a read, or write data for a write
 		if(cache[index].block[b].tag == tag && cache[index].block[b].valid == VALID){
 			if(we == READ){
-				data = (word*)&cache[index].block[b].data[offset];
+				data = (word*)&(cache[index].block[b].data[offset]);
 			}
 			else{
 				cache[index].block[b].data[offset] = *data;
@@ -222,7 +222,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	//copy block from memory
 	memcpy(temp, addr, (size_t)block_size);
 	if(we == READ){
-		data = (word*)&temp->data[offset];
+		data = (word*)&(temp->data[offset]);
 	}
 	else{
 		//check memory sync policy and act accordingly

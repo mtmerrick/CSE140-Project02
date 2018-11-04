@@ -181,7 +181,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			else{
 				cache[index].block[b].data[offset] = *data;
 				if(memory_sync_policy == WRITE_THROUGH){
-					memcpy(addr, (word*)&temp[index].block[b], (size_t)block_size);
+					memcpy(addr, (word*)&(temp[index].block[b]), (size_t)block_size);
 				}
 				else{
 					cache[index].block[b].dirty = DIRTY;
@@ -209,7 +209,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			aNum = randomint(assoc);
 		}
 	}
-	temp = (word*)&temp[index].block[aNum];
+	temp = (word*)&(temp[index].block[aNum]);
 	//reset LRU value for the chosen block
 	temp->lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it

@@ -176,12 +176,12 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 		//if it's a hit, grab the data for a read, or write data for a write
 		if(cache[index].block[b].tag == tag && cache[index].block[b].valid == VALID){
 			if(we == READ){
-				data = &cache[index].block[b].data[offset];
+				data = (word*)&cache[index].block[b].data[offset];
 			}
 			else{
 				cache[index].block[b].data[offset] = *data;
 				if(memory_sync_policy == WRITE_THROUGH){
-					memcpy(addr, &cache[index].block[b], (size_t)block_size);
+					memcpy(addr, (word*)&temp[index].block[b], (size_t)block_size);
 				}
 				else{
 					cache[index].block[b].dirty = DIRTY;
@@ -209,7 +209,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			aNum = randomint(assoc);
 		}
 	}
-	temp = &cache[index].block[aNum];
+	temp = (word*)&temp[index].block[aNum];
 	//reset LRU value for the chosen block
 	temp->lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it
@@ -222,7 +222,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	//copy block from memory
 	memcpy(temp, addr, (size_t)block_size);
 	if(we == READ){
-		data = &temp->data[offset];
+		data = (word*)&temp->data[offset];
 	}
 	else{
 		//check memory sync policy and act accordingly

@@ -181,7 +181,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			else{
 				cache[index].block[b].data[offset] = *data;
 				if(memory_sync_policy == WRITE_THROUGH){
-					memcpy(addr, (word*)&(temp[index].block[b]), (size_t)block_size);
+					memcpy(addr, (word*)&(cache[index].block[b]), (size_t)block_size);
 				}
 				else{
 					cache[index].block[b].dirty = DIRTY;

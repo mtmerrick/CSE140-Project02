@@ -88,7 +88,6 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	TransferUnit transfer = 0;
 	int b = 0;
 	int aNum = 0;
-	CacheAction hm = MISS;
 
 	/* handle the case of no cache at all - leave this in */
 	if(assoc == 0) {
@@ -219,6 +218,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 
 	//reset LRU value for the chosen block
 	cache[index].block[aNum].lru.value = 0;
+	cache[index].block[aNum].valid = VALID;
 	// if the block has been changed, write back to memory before replacing it
 	if(cache[index].block[aNum].dirty == DIRTY){
 		accessDRAM(addr, cache[index].block[aNum].data, transfer, WRITE);
@@ -241,7 +241,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	else{
 		memcpy(data, cache[index].block[aNum].data + offset, 4);
 	}
-	cache[index].block[b].valid = VALID;
+	
 		//}
 
 		/*

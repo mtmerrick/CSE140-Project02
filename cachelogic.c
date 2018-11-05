@@ -222,7 +222,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	if(!accessDRAM(addr, temp->data, block_size, READ)){
+	if(!accessDRAM(addr, temp, block_size, READ)){
 		if(we == WRITE){
 			memcpy(temp->data + offset, data, 4);
 			//temp->data[offset] = *data;

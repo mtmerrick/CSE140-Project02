@@ -78,18 +78,16 @@ void init_lru(int assoc_index, int block_index) {
 	*/
 void accessMemory(address addr, word* data, WriteEnable we) {
 	/* Declare variables here */
-	unsigned int index_bits;
-	unsigned int offset_bits;
-	unsigned int tag_bits;
-	unsigned int tag;
-	unsigned int offset;
-	unsigned int index;
+	unsigned int index_bits = 0;
+	unsigned int offset_bits = 0;
+	unsigned int tag_bits = 0;
+	unsigned int tag = 0;
+	unsigned int offset = 0;
+	unsigned int index = 0;
 	unsigned int mask = 0;
-	TransferUnit transfer;
-	//cacheBlock temp;
+	TransferUnit transfer = 0;
 	int b = 0;
 	int aNum = 0;
-	//unsigned int tempAddr;
 
 	/* handle the case of no cache at all - leave this in */
 	if(assoc == 0) {
@@ -227,7 +225,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	/*if(*/!accessDRAM(addr, cache[index].block[aNum].data, transfer, READ);//){
+	/*if(!*/accessDRAM(addr, cache[index].block[aNum].data, transfer, READ);//){
 		if(we == WRITE){
 			memcpy(cache[index].block[aNum].data + offset, data, 4);
 			//check memory sync policy and act accordingly

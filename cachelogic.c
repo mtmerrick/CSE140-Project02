@@ -227,10 +227,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	if(hm == MISS){
-		accessDRAM(addr, cache[index].block[aNum].data, transfer, READ);
-	}
-		
+	/*if(!*/accessDRAM(addr, cache[index].block[aNum].data, transfer, READ);//){
 	if(we == WRITE){
 		memcpy(cache[index].block[aNum].data + offset, data, 4);
 		//check memory sync policy and act accordingly
@@ -244,10 +241,10 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	else{
 		memcpy(data, cache[index].block[aNum].data + offset, 4);
 	}
-	//}
-	
+	cache[index].block[b].valid = VALID;
+		//}
 
-	/*
+		/*
 	You need to read/write between memory (via the accessDRAM() function) and
 	the cache (via the cache[] global structure defined in tips.h)
 
@@ -274,13 +271,12 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	functions can be found in tips.h
 	*/
 
-	/* Start adding code here */
+		/* Start adding code here */
 
-
-	/* This call to accessDRAM occurs when you modify any of the
+		/* This call to accessDRAM occurs when you modify any of the
 	 cache parameters. It is provided as a stop gap solution.
 	 At some point, ONCE YOU HAVE MORE OF YOUR CACHELOGIC IN PLACE,
 	 THIS LINE SHOULD BE REMOVED.
 	*/
-	//accessDRAM(addr, (byte*)data, WORD_SIZE, we);
+		//accessDRAM(addr, (byte*)data, WORD_SIZE, we);
 }

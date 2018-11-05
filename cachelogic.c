@@ -88,6 +88,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	TransferUnit transfer = 0;
 	int b = 0;
 	int aNum = 0;
+	CacheAction hm = MISS;
 
 	/* handle the case of no cache at all - leave this in */
 	if(assoc == 0) {
@@ -180,6 +181,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	for(; b < assoc; b++){
 		//if it's a hit, grab the data for a read, or write data for a write
 		if(cache[index].block[b].tag == tag && cache[index].block[b].valid == VALID){
+			hm = HIT;
 			if(we == READ){
 				memcpy(data, cache[index].block[b].data + offset, 4);
 			}
@@ -225,20 +227,23 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	/*if(!*/accessDRAM(addr, cache[index].block[aNum].data, transfer, READ);//){
-		if(we == WRITE){
-			memcpy(cache[index].block[aNum].data + offset, data, 4);
-			//check memory sync policy and act accordingly
-			if(memory_sync_policy == WRITE_THROUGH){
-				accessDRAM(addr, cache[index].block[aNum].data, transfer, WRITE);
-			}
-			else{
-				cache[index].block[aNum].dirty = DIRTY;
-			}
+	if(hm == MISS){
+		accessDRAM(addr, cache[index].block[aNum].data, transfer, READ);
+	}
+		
+	if(we == WRITE){
+		memcpy(cache[index].block[aNum].data + offset, data, 4);
+		//check memory sync policy and act accordingly
+		if(memory_sync_policy == WRITE_THROUGH){
+			accessDRAM(addr, cache[index].block[aNum].data, transfer, WRITE);
 		}
 		else{
-			memcpy(data, cache[index].block[aNum].data + offset, 4);
+			cache[index].block[aNum].dirty = DIRTY;
 		}
+	}
+	else{
+		memcpy(data, cache[index].block[aNum].data + offset, 4);
+	}
 	//}
 	
 

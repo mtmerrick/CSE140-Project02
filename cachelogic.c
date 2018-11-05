@@ -183,7 +183,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			else{
 				memcpy(cache[index].block[b].data + offset, data, 4);
 				if(memory_sync_policy == WRITE_THROUGH){
-					accessDRAM(addr, cache[index].block[b].data, block_size, WRITE);
+					accessDRAM(addr, cache[index].block[b].data, block_size, (flag)WRITE);
 				}
 				else{
 					cache[index].block[b].dirty = DIRTY;
@@ -216,7 +216,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	cache[index].block[aNum].lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it
 	if(cache[index].block[aNum].dirty == DIRTY){
-		accessDRAM(addr, cache[index].block[aNum].data, block_size, WRITE);
+		accessDRAM(addr, cache[index].block[aNum].data, block_size, (flag)WRITE);
 	}
 	//highlight chosen block
 	highlight_block(index ,aNum);
@@ -227,7 +227,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			memcpy(cache[index].block[aNum].data + offset, data, 4);
 			//check memory sync policy and act accordingly
 			if(memory_sync_policy == WRITE_THROUGH){
-				accessDRAM(addr, cache[index].block[aNum].data, MAX_BLOCK_SIZE, WRITE);
+				accessDRAM(addr, cache[index].block[aNum].data, MAX_BLOCK_SIZE, (flag)WRITE);
 			}
 			else{
 				cache[index].block[aNum].dirty = DIRTY;

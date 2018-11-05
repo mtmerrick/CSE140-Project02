@@ -220,14 +220,14 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	memcpy(temp, (word*)addr, (size_t)block_size);
+	memcpy(temp->data[b], (word*)addr, (size_t)block_size);
 	if(we == READ){
 		data = (word*)&(temp->data[offset]);
 	}
 	else{
 		//check memory sync policy and act accordingly
 		if(memory_sync_policy == WRITE_THROUGH){
-			memcpy((word*)addr, temp, (size_t)block_size);
+			memcpy((word*)addr, temp->data[b], (size_t)block_size);
 		}
 		else{
 			temp->dirty = DIRTY;

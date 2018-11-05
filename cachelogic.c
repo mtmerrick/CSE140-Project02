@@ -4,7 +4,7 @@
 /* The following two functions are defined in util.c */
 
 /* finds the highest 1 bit, and returns its position, else 0xFFFFFFFF */
-unsigned int uint_log2(word w); 
+unsigned int uint_log2(word w);
 
 /* return random int from 0..x-1 */
 int randomint( int x );
@@ -181,7 +181,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			else{
 				cache[index].block[b].data[offset] = *data;
 				if(memory_sync_policy == WRITE_THROUGH){
-					memcpy((word*)addr, (word*)&(cache[index].block[b]), (size_t)block_size);
+					accessDRAM(addr, temp, block_size, WRITE);
 				}
 				else{
 					cache[index].block[b].dirty = DIRTY;
@@ -214,27 +214,26 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	temp->lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it
 	if(temp->dirty == DIRTY){
-		memcpy((word*)addr, (word*)temp, (size_t)block_size);
+		accessDRAM(addr, temp, block_size, WRITE);
 	}
 	//highlight chosen block
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	memcpy(temp->data, (word*)addr, (size_t)block_size);
-	if(we == READ){
-		data = (word*)&(temp->data[offset]);
-	}
-	else{
-		//check memory sync policy and act accordingly
-		if(memory_sync_policy == WRITE_THROUGH){
-			memcpy((word*)addr, temp, (size_t)block_size);
+	if(!accessDRAM(addr, temp, block_size, READ)){
+		if(we == WRITE){
+			temp->data[offset] = *data;
+			//check memory sync policy and act accordingly
+			if(memory_sync_policy == WRITE_THROUGH){
+				accessDRAM(addr, temp, block_size, WRITE);
+			}
+			else{
+				temp->dirty = DIRTY;
+			}
 		}
-		else{
-			temp->dirty = DIRTY;
-		}
-		temp->data[offset] = *data;
 	}
 	
+
 	/*
 	You need to read/write between memory (via the accessDRAM() function) and
 	the cache (via the cache[] global structure defined in tips.h)

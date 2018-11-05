@@ -218,7 +218,9 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	//reset LRU value for the chosen block
 	cache[index].block[aNum].lru.value = 0;
 	cache[index].block[aNum].valid = VALID;
-	cache[index].block[b].tag = tag;
+	for (int i = 0; i < offset; i++){
+		cache[index].block[i].tag = tag;
+	}
 	// if the block has been changed, write back to memory before replacing it
 	if(cache[index].block[aNum].dirty == DIRTY){
 		accessDRAM(addr, cache[index].block[aNum].data, transfer, WRITE);

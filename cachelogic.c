@@ -85,6 +85,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	unsigned int offset;
 	unsigned int index;
 	unsigned int mask = 0;
+	TransferUnit transfer;
 	//cacheBlock temp;
 	int b = 0;
 	int aNum = 0;
@@ -100,21 +101,25 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 		case 4:
 		{
 			offset_bits = 2;
+			transfer = WORD_SIZE;
 			break;
 		}
 		case 8:
 		{
 			offset_bits = 3;
+			transfer = DOUBLEWORD_SIZE;
 			break;
 		}
 		case 16:
 		{
 			offset_bits = 4;
+			transfer = QUADWORD_SIZE;
 			break;
 		}
 		case 32:
 		{
 			offset_bits = 5;
+			transfer = OCTWORD_SIZE;
 			break;
 		}
 		default:
@@ -183,7 +188,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			else{
 				memcpy(cache[index].block[b].data + offset, data, 4);
 				if(memory_sync_policy == WRITE_THROUGH){
-					accessDRAM(addr, cache[index].block[b].data, block_size, (WriteEnable)WRITE);
+					accessDRAM(addr, cache[index].block[b].data, transfer, WRITE);
 				}
 				else{
 					cache[index].block[b].dirty = DIRTY;
@@ -216,18 +221,18 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	cache[index].block[aNum].lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it
 	if(cache[index].block[aNum].dirty == DIRTY){
-		accessDRAM(addr, cache[index].block[aNum].data, block_size, (WriteEnable)WRITE);
+		accessDRAM(addr, cache[index].block[aNum].data, transfer, WRITE);
 	}
 	//highlight chosen block
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	/*if(*/!accessDRAM(addr, cache[index].block[aNum].data, MAX_BLOCK_SIZE, (WriteEnable)READ);//){
+	/*if(*/!accessDRAM(addr, cache[index].block[aNum].data, transfer, READ);//){
 		if(we == WRITE){
 			memcpy(cache[index].block[aNum].data + offset, data, 4);
 			//check memory sync policy and act accordingly
 			if(memory_sync_policy == WRITE_THROUGH){
-				accessDRAM(addr, cache[index].block[aNum].data, MAX_BLOCK_SIZE, (WriteEnable)WRITE);
+				accessDRAM(addr, cache[index].block[aNum].data, transfer, WRITE);
 			}
 			else{
 				cache[index].block[aNum].dirty = DIRTY;

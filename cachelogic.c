@@ -179,7 +179,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	//determine if this is a hit or a miss
 	for(; b < assoc; b++){
 		//if it's a hit, grab the data for a read, or write data for a write
-		if(/*cache[index].block[b].tag == tag &&*/ cache[index].block[b].valid == VALID){
+		if(cache[index].block[b].tag == tag && cache[index].block[b].valid == VALID){
 			if(we == READ){
 				memcpy(data, cache[index].block[b].data + offset, 4);
 			}
@@ -218,9 +218,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	//reset LRU value for the chosen block
 	cache[index].block[aNum].lru.value = 0;
 	cache[index].block[aNum].valid = VALID;
-	for (int i = 0; i < offset; i++){
-		cache[index].block[i].tag = tag;
-	}
+	cache[index].block[b].tag = tag;
 	// if the block has been changed, write back to memory before replacing it
 	if(cache[index].block[aNum].dirty == DIRTY){
 		accessDRAM(addr, cache[index].block[aNum].data, transfer, WRITE);

@@ -156,21 +156,21 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	// get tag
 	tag_bits = 32 - (index_bits + offset_bits);
 	for(int i = 0;i < tag_bits; i++){
-		mask += 1 << (32 - i); //pow(2,32-(int)i);
+		mask += 1 << (32 - i);
 	}
 	tag = addr & mask;
 	tag = tag >> (32 - tag_bits);
 	//get index
 	mask = 0;
 	for(int i = 0; i < index_bits; i++){
-		mask += 1 << (32 - tag_bits - i); //pow(2, 32 - (int)tag_bits - (int)i);
+		mask += 1 << (32 - tag_bits - i);
 	}
 	index = addr & mask;
 	index = index >> (32 - index_bits);
 	//get offset
 	mask = 0;
 	for(int i = 0; i < offset_bits; i++){
-		mask += 1 << (i); //pow(2, (int)i);
+		mask += 1 << (i);
 	}
 	offset = addr & mask;
 	//determine if this is a hit or a miss
@@ -178,10 +178,10 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 		//if it's a hit, grab the data for a read, or write data for a write
 		if(cache[index].block[b].tag == tag && cache[index].block[b].valid == VALID){
 			if(we == READ){
-				data = (word*)&(cache[index].block[b].data[offset]);
+				memcpy(data, cache[index].block[b].data + offset, 4);
 			}
 			else{
-				cache[index].block[b].data[offset] = *data;
+				memcpy(cache[index].block[b].data + offset, data, 4);
 				if(memory_sync_policy == WRITE_THROUGH){
 					accessDRAM(addr, cache[index].block[b].data, block_size, WRITE);
 				}

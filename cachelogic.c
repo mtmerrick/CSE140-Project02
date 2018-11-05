@@ -222,12 +222,12 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	if(!accessDRAM(addr, cache[index].block[aNum].data, MAX_BLOCK_SIZE, READ)){
+	/*if(*/!accessDRAM(addr, cache[index].block[aNum].data, MAX_BLOCK_SIZE, READ);//){
 		if(we == WRITE){
 			memcpy(cache[index].block[aNum].data + offset, data, 4);
 			//check memory sync policy and act accordingly
 			if(memory_sync_policy == WRITE_THROUGH){
-				accessDRAM(addr, cache[index].block[aNum].data, block_size, WRITE);
+				accessDRAM(addr, cache[index].block[aNum].data, MAX_BLOCK_SIZE, WRITE);
 			}
 			else{
 				cache[index].block[aNum].dirty = DIRTY;

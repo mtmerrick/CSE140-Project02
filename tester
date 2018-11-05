@@ -1,0 +1,3 @@
+make &&
+export DISPLAY=:0 &&
+gdb ./tips -ex 'break cachelogic.c:212' -ex 'break cachelogic.c:223' -ex 'break cachelogic.c:224' -ex 'break cachelogic.c:227' -ex 'run'

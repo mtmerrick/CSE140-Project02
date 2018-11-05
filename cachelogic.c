@@ -85,7 +85,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	unsigned int offset;
 	unsigned int index;
 	unsigned int mask = 0;
-	cacheBlock temp;
+	//cacheBlock temp;
 	int b = 0;
 	int aNum = 0;
 	//unsigned int tempAddr;
@@ -211,31 +211,30 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			aNum = randomint(assoc);
 		}
 	}
-	temp = cache[index].block[aNum];
+	//temp = cache[index].block[aNum];
 	//reset LRU value for the chosen block
-	temp.lru.value = 0;
+	cache[index].block[aNum].lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it
-	if(temp.dirty == DIRTY){
-		accessDRAM(addr, temp.data, block_size, WRITE);
+	if(cache[index].block[aNum].dirty == DIRTY){
+		accessDRAM(addr, cache[index].block[aNum].data, block_size, WRITE);
 	}
 	//highlight chosen block
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	if(!accessDRAM(addr, temp.data, block_size, READ)){
+	if(!accessDRAM(addr, cache[index].block[aNum].data, block_size, READ)){
 		if(we == WRITE){
-			memcpy(temp.data + offset, data, 4);
-			//temp.data[offset] = *data;
+			memcpy(cache[index].block[aNum].data + offset, data, 4);
 			//check memory sync policy and act accordingly
 			if(memory_sync_policy == WRITE_THROUGH){
-				accessDRAM(addr, temp.data, block_size, WRITE);
+				accessDRAM(addr, cache[index].block[aNum].data, block_size, WRITE);
 			}
 			else{
-				temp.dirty = DIRTY;
+				cache[index].block[aNum].dirty = DIRTY;
 			}
 		}
 		else{
-			memcpy(data, temp.data + offset, 4);
+			memcpy(data, cache[index].block[aNum].data + offset, 4);
 		}
 	}
 	

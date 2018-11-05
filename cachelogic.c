@@ -165,8 +165,8 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	tag = tag >> (32 - tag_bits);
 	//get index
 	mask = 0;
-	for(int i = 1; i < index_bits; i++){
-		mask += 1 << (32 - tag_bits - i);
+	for(int i = 0; i < index_bits; i++){
+		mask += 1 << (offset_bits + i);
 	}
 	index = addr & mask;
 	index = index >> (32 - index_bits);

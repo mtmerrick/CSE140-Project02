@@ -211,7 +211,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			aNum = randomint(assoc);
 		}
 	}
-	//temp = cache[index].block[aNum];
+
 	//reset LRU value for the chosen block
 	cache[index].block[aNum].lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it
@@ -222,7 +222,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	if(!accessDRAM(addr, cache[index].block[aNum].data, block_size, READ)){
+	/*if(!*/accessDRAM(addr, cache[index].block[aNum].data, block_size, READ)//){
 		if(we == WRITE){
 			memcpy(cache[index].block[aNum].data + offset, data, 4);
 			//check memory sync policy and act accordingly
@@ -236,7 +236,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 		else{
 			memcpy(data, cache[index].block[aNum].data + offset, 4);
 		}
-	}
+	// }
 	
 
 	/*

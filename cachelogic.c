@@ -214,20 +214,20 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	temp->lru.value = 0;
 	// if the block has been changed, write back to memory before replacing it
 	if(temp->dirty == DIRTY){
-		memcpy((word*)addr, temp, (size_t)block_size);
+		memcpy((word*)addr, (word*)temp, (size_t)block_size);
 	}
 	//highlight chosen block
 	highlight_block(index ,aNum);
 	highlight_offset(index, aNum, offset, MISS);
 	//copy block from memory
-	memcpy(temp->data[b], (word*)addr, (size_t)block_size);
+	memcpy((void*)temp, (void*)addr, (size_t)block_size);
 	if(we == READ){
 		data = (word*)&(temp->data[offset]);
 	}
 	else{
 		//check memory sync policy and act accordingly
 		if(memory_sync_policy == WRITE_THROUGH){
-			memcpy((word*)addr, temp->data[b], (size_t)block_size);
+			memcpy((word*)addr, (word*)temp, (size_t)block_size);
 		}
 		else{
 			temp->dirty = DIRTY;

@@ -224,8 +224,8 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 	//copy block from memory
 	if(!accessDRAM(addr, temp->data, block_size, READ)){
 		if(we == WRITE){
-			memcpy(&temp->data[offset], data, 4);
-			temp->data[offset] = *data;
+			memcpy(temp->data + offset, data, 4);
+			//temp->data[offset] = *data;
 			//check memory sync policy and act accordingly
 			if(memory_sync_policy == WRITE_THROUGH){
 				accessDRAM(addr, temp->data, block_size, WRITE);
@@ -233,6 +233,9 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 			else{
 				temp->dirty = DIRTY;
 			}
+		}
+		else{
+			memcpy(data, temp->data + offset, 4);
 		}
 	}
 	

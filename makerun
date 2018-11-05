@@ -1,1 +1,1 @@
-make && export DISPLAY=:0 && ./tips
+make && export DISPLAY=:0 && ./tips  --force-display-scale-factor=1.5

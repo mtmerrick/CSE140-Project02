@@ -169,7 +169,7 @@ void accessMemory(address addr, word* data, WriteEnable we) {
 		mask += 1 << (offset_bits + i);
 	}
 	index = addr & mask;
-	index = index >> (32 - index_bits);
+	index = index >> (offset_bits);
 	//get offset
 	mask = 0;
 	for(int i = 0; i < offset_bits; i++){
